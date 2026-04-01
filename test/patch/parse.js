@@ -211,6 +211,33 @@ Index: test2
         }]);
     });
 
+    it('should parse Mercurial-style diff -r header and index filename', function() {
+      const patchStr = [
+        'diff -r 9117c6561b0b -r 273ce12ad8f1 .hgignore',
+        '===================================================================',
+        '--- /dev/null\tThu Jan 01 00:00:00 1970 +0000',
+        '+++ b/.hgignore\tTue May 03 13:27:13 2005 -0800',
+        '@@ -0,0 +1,1 @@',
+        '+.*~'
+      ].join('\n');
+      const patchObj = parsePatch(patchStr);
+      expect(patchObj).to.eql([{
+        index: '.hgignore',
+        oldFileName: '/dev/null',
+        oldHeader: 'Thu Jan 01 00:00:00 1970 +0000',
+        newFileName: 'b/.hgignore',
+        newHeader: 'Tue May 03 13:27:13 2005 -0800',
+        hunks: [{
+          oldStart: 0,
+          oldLines: 0,
+          newStart: 1,
+          newLines: 1,
+          lines: ['+.*~'],
+          linedelimiters: ['\n']
+        }]
+      }]);
+    });
+
     it('should parse multiple files without the Index line', function() {
       expect(parsePatch(
 `--- from\theader1
